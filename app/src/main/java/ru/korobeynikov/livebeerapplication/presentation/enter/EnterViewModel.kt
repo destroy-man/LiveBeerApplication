@@ -1,4 +1,4 @@
-package ru.korobeynikov.livebeerapplication.presentation
+package ru.korobeynikov.livebeerapplication.presentation.enter
 
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel

@@ -12,16 +12,19 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import ru.korobeynikov.livebeerapplication.presentation.AuthorizationScreen
-import ru.korobeynikov.livebeerapplication.presentation.EnterScreen
+import ru.korobeynikov.livebeerapplication.presentation.enter.EnterScreen
+import ru.korobeynikov.livebeerapplication.presentation.registration.RegistrationScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .safeContentPadding()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .safeContentPadding()
+            ) {
                 val navController = rememberNavController()
                 NavHost(
                     navController = navController,

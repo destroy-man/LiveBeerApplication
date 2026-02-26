@@ -1,4 +1,4 @@
-package ru.korobeynikov.livebeerapplication.presentation
+package ru.korobeynikov.livebeerapplication.presentation.enter
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,17 +25,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.input.TransformedText
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import ru.korobeynikov.livebeerapplication.presentation.PhoneVisualTransformation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,16 +44,21 @@ fun EnterScreen(navController: NavController, enterViewModel: EnterViewModel = v
         navController.navigate("registration")
     }
 
+    val colorCyan = Color(0xFF007AFF)
+    val colorDarkGrey = Color(0xFF8E8E93)
+    val colorLightGrey = Color(0xFFF0F0F0)
+    val colorYellow = Color(0xFFFFE100)
+
     Scaffold(topBar = {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) {
                 Icon(
                     Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                     contentDescription = null,
-                    tint = Color(0xFF007AFF)
+                    tint = colorCyan
                 )
             }
-            Text("Назад", color = Color(0xFF007AFF), modifier = Modifier.offset((-15).dp))
+            Text("Назад", color = colorCyan, modifier = Modifier.offset((-15).dp))
         }
     }) { paddingValues ->
         Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding() + 8.dp)) {
@@ -69,7 +71,7 @@ fun EnterScreen(navController: NavController, enterViewModel: EnterViewModel = v
                 "Мы вышлем вам проверочный код",
                 fontSize = 15.sp,
                 modifier = Modifier.padding(start = 24.dp, top = 8.dp),
-                color = Color(0xFF8E8E93)
+                color = colorDarkGrey
             )
 
             val phone by enterViewModel.phone.collectAsState(TextFieldValue("+7 "))
@@ -89,10 +91,8 @@ fun EnterScreen(navController: NavController, enterViewModel: EnterViewModel = v
             Button(
                 enabled = phone.text.length == maxLength,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (phone.text.length < maxLength) Color(0xFFF0F0F0) else Color(
-                        0xFFFFE100
-                    ),
-                    contentColor = Color(0xFF08070C)
+                    containerColor = if (phone.text.length < maxLength) colorLightGrey else colorYellow,
+                    contentColor = Color.Black
                 ),
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier
@@ -112,44 +112,10 @@ fun EnterScreen(navController: NavController, enterViewModel: EnterViewModel = v
                 Text("У вас нет аккаунта? ")
                 Text(
                     "Регистрация",
-                    color = Color(0xFF007AFF),
-                    modifier = Modifier.clickable(enabled = true, onClick = onRegistration)
+                    color = colorCyan,
+                    modifier = Modifier.clickable(onClick = onRegistration)
                 )
             }
         }
-    }
-}
-
-class PhoneVisualTransformation : VisualTransformation {
-
-    override fun filter(text: AnnotatedString): TransformedText {
-        var out = ""
-        for (i in text.text.indices) {
-            if (i == 3) out += "("
-            if (i == 6) out += ") "
-            if (i == 9 || i == 11) out += " "
-            out += text.text[i]
-        }
-        return TransformedText(AnnotatedString(out), phoneNumberOffsetTranslator)
-    }
-
-    private val phoneNumberOffsetTranslator = object : OffsetMapping {
-
-        override fun originalToTransformed(offset: Int): Int =
-            when (offset) {
-                in 0..3 -> 3
-                in 4..6 -> offset + 1
-                in 7..9 -> offset + 3
-                in 10..11 -> offset + 4
-                else -> offset + 5
-            }
-
-        override fun transformedToOriginal(offset: Int): Int =
-            when (offset) {
-                in 0..3 -> 3
-                in 4..8 -> offset - 1
-                in 9..13 -> offset - 4
-                else -> offset - 7
-            }
     }
 }
