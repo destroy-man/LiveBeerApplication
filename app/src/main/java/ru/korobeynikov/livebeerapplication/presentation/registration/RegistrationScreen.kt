@@ -1,5 +1,6 @@
 package ru.korobeynikov.livebeerapplication.presentation.registration
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -40,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -53,7 +55,7 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import ru.korobeynikov.livebeerapplication.presentation.PhoneVisualTransformation
@@ -64,16 +66,20 @@ import java.time.YearMonth
 @Composable
 fun RegistrationScreen(
     navController: NavController,
-    registrationViewModel: RegistrationViewModel = viewModel(),
+    registrationViewModel: RegistrationViewModel = hiltViewModel(),
 ) {
     val onBack: () -> Unit = {
         navController.popBackStack()
+    }
+    val onAuthorization: () -> Unit = {
+        navController.navigate("authorization")
     }
 
     val colorCyan = Color(0xFF007AFF)
     val colorGrey = Color(0xFF8E8E93)
     val colorYellow = Color(0xFFFFE100)
 
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
@@ -233,7 +239,20 @@ fun RegistrationScreen(
                 modifier = Modifier
                     .padding(start = 16.dp, end = 16.dp, top = 24.dp)
                     .fillMaxWidth(),
-                onClick = {}
+                onClick = {
+                    registrationViewModel.registerUser(
+                        onSuccess = {
+                            onAuthorization()
+                        },
+                        onShowMessage = {
+                            Toast.makeText(
+                                context,
+                                "Такой пользователь уже зарегистрирован!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    )
+                }
             ) {
                 Text("Регистрация")
             }

@@ -1,4 +1,4 @@
-package ru.korobeynikov.livebeerapplication
+package ru.korobeynikov.livebeerapplication.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,10 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import ru.korobeynikov.livebeerapplication.presentation.AuthorizationScreen
+import dagger.hilt.android.AndroidEntryPoint
 import ru.korobeynikov.livebeerapplication.presentation.enter.EnterScreen
 import ru.korobeynikov.livebeerapplication.presentation.registration.RegistrationScreen
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
