@@ -33,8 +33,9 @@ class PhoneVisualTransformation : VisualTransformation {
             when (offset) {
                 in 0..3 -> 3
                 in 4..8 -> offset - 1
-                in 9..13 -> offset - 4
-                else -> offset - 7
+                in 9..13 -> offset - 3
+                in 14..16 -> offset - 4
+                else -> offset - 5
             }
     }
 }

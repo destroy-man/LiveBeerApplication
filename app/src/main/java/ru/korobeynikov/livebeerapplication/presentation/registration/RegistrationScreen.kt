@@ -22,7 +22,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -40,8 +39,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -53,6 +55,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -85,15 +88,19 @@ fun RegistrationScreen(
     val sheetState = rememberModalBottomSheetState()
 
     Scaffold(topBar = {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack) {
+        Button(
+            onClick = onBack,
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                     contentDescription = null,
-                    tint = colorCyan
+                    tint = colorCyan,
+                    modifier = Modifier.offset((-15).dp)
                 )
+                Text("Назад", color = colorCyan, modifier = Modifier.offset((-15).dp))
             }
-            Text("Назад", color = colorCyan, modifier = Modifier.offset((-15).dp))
         }
     }
     ) { paddingValues ->
@@ -261,22 +268,38 @@ fun RegistrationScreen(
         if (showBottomSheet) {
             ModalBottomSheet(sheetState = sheetState, onDismissRequest = {}) {
                 val months = listOf(
-                    "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль",
-                    "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+                    "", "", "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль",
+                    "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь", "", ""
                 )
                 val monthsState = rememberLazyListState()
                 val selectedMonth by remember {
-                    derivedStateOf { monthsState.firstVisibleItemIndex + 3 }
+                    derivedStateOf { monthsState.firstVisibleItemIndex + 1 }
                 }
 
-                val years = (2000..LocalDate.now().year).toList()
+                val years = (2000..LocalDate.now().year).map { it.toString() }
+                    .toMutableList()
+                    .apply {
+                        add(0, "")
+                        add(0, "")
+                        add("")
+                        add("")
+                    }
+                    .toList()
                 val yearsState = rememberLazyListState()
-                val selectedYear by remember { derivedStateOf { yearsState.firstVisibleItemIndex + 3 } }
+                val selectedYear by remember { derivedStateOf { yearsState.firstVisibleItemIndex + 1 } }
 
                 val yearMonth = YearMonth.of(selectedYear, selectedMonth)
-                val days = (1..yearMonth.lengthOfMonth()).toList()
+                val days = (1..yearMonth.lengthOfMonth()).map { it.toString() }
+                    .toMutableList()
+                    .apply {
+                        add(0, "")
+                        add(0, "")
+                        add("")
+                        add("")
+                    }
+                    .toList()
                 val daysState = rememberLazyListState()
-                val selectedDay by remember { derivedStateOf { daysState.firstVisibleItemIndex + 3 } }
+                val selectedDay by remember { derivedStateOf { daysState.firstVisibleItemIndex + 1 } }
 
                 CalendarActionsBar(
                     colorCyan = colorCyan,
@@ -355,18 +378,19 @@ fun CalendarActionsBar(colorCyan: Color, onCancel: () -> Unit, onDone: () -> Uni
 }
 
 @Composable
-fun <T> Picker(modifier: Modifier, listState: LazyListState, list: List<T>) {
+fun Picker(modifier: Modifier, listState: LazyListState, list: List<String>) {
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
+        Border(itemHeight = itemHeight.dp, color = Color.Black)
         LazyColumn(state = listState) {
             items(list.size) { index ->
                 Box(
                     modifier = Modifier.fillParentMaxHeight(1f / countOfVisibleItemsInPicker),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(list[index].toString(), fontSize = 15.sp)
+                    Text(list[index], fontSize = 15.sp)
                 }
             }
         }
@@ -381,3 +405,29 @@ internal const val itemHeight = 35f
 
 // Высота списка
 internal const val listHeight = countOfVisibleItemsInPicker * itemHeight
+
+@Composable
+internal fun Border(itemHeight: Dp, color: Color) {
+    val width = 2.dp
+    val strokeWidthPx = with(LocalDensity.current) { width.toPx() }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(itemHeight)
+            .drawBehind {
+                drawLine(
+                    color = color,
+                    strokeWidth = strokeWidthPx,
+                    start = Offset(0f, 0f),
+                    end = Offset(size.width, 0f)
+                )
+
+                drawLine(
+                    color = color,
+                    strokeWidth = strokeWidthPx,
+                    start = Offset(0f, size.height),
+                    end = Offset(size.width, size.height)
+                )
+            }
+    ) {}
+}
