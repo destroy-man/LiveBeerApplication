@@ -29,8 +29,12 @@ class RegistrationViewModel : ViewModel() {
         _fullName.value = value
     }
 
-    fun changeBirthDate(value: String) {
-        _birthDate.value = value
+
+    fun changeBirthDate(day: Int, month: Int, year: Int) {
+        val dayStr=if(day<10)"0$day" else day.toString()
+        val monthStr=if(month<10)"0$month" else month.toString()
+        val yearStr=if(year<10)"0$year" else year.toString()
+        _birthDate.value ="$dayStr.$monthStr.$yearStr"
     }
 
     fun changeIsAgree(value: Boolean) {
